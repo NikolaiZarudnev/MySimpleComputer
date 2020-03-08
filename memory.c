@@ -110,6 +110,7 @@ int sc_commandEncode(int command, int operand, int *value) {
 		return F_WRONG_COMMAND;
 	}
 	*value = command << 7 | operand;
+    
     return 0;
 }
 /*декодирует значение как команду Simple Computer*/
