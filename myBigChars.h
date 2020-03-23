@@ -5,18 +5,16 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define LEFT_UPPER_CORNER 'l'
-#define LEFT_BOTTOM_CORNER 'm'
-#define RIGHT_UPPER_CORNER 'k'
-#define RIGHT_BOTTOM_CORNER 'j'
-#define VERTICAL 'x'
-#define HORIZONTAL 'q'
-#define RECTANGLE 'a'
+#define LEFT_UPPER_CORNER "l"
+#define LEFT_BOTTOM_CORNER "m"
+#define RIGHT_UPPER_CORNER "k"
+#define RIGHT_BOTTOM_CORNER "j"
+#define VERTICAL "x"
+#define HORIZONTAL "q"
+#define RECTANGLE "a"
 
 int bc_printA (char * str);/*выводит строку символов с использованием дополнительной кодировочной таблицы;*/
-int bc_box(int x1, int y1, int x2, int y2);/* - выводит на экран псевдогра-
-фическую рамку, в которой левый верхний угол располагается в строке x1 и столбце
-y1, а еѐ ширина и высота равна y2 столбцов и x2 строк;*/
+int bc_box(int x1, int y1, int x2, int y2);
 int bc_printbigchar(int *big, int x, int y, enum colors fg, enum colors bg);/* -
 выводит на экран "большой символ" размером восемь строк на восемь столбцов, левый
 верхний угол которого располагается в строке x и столбце y. Третий и четвѐртый па-

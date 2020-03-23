@@ -8,8 +8,9 @@ int main() {
     
     for (int i = 0; i < 10; i++)
     {
-        check = bc_printA(VERTICAL);
+        //check = bc_printA(VERTICAL);
     }
-    getchar();
+    check = bc_box(2, 2, 8, 8);
+    printf("\n");
     return 0;
 }

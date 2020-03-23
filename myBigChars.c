@@ -5,20 +5,30 @@ int bc_printA(char *str)
 	printf("\E(0%s\E(B", str);
 	return 0;
 }
-
+/* - выводит на экран псевдогра-
+фическую рамку, в которой левый верхний угол располагается в строке x1 и столбце
+y1, а еѐ ширина и высота равна y2 столбцов и x2 строк;*/
 int bc_box(int x1, int y1, int x2, int y2) {
     int check = 0;
     check = mt_gotoXY(x1, y1);
     if(check == -1) {
         printf("Some trouble with gotoXY\n");
-
+		return -1;
     }
     bc_printA(LEFT_UPPER_CORNER);
+	mt_gotoXY(x2, y1);
+    bc_printA(RIGHT_UPPER_CORNER);
+	mt_gotoXY(x2, y2);
+	bc_printA(RIGHT_BOTTOM_CORNER);
+	mt_gotoXY(x1, y2);
+	bc_printA(LEFT_BOTTOM_CORNER);
     for (int i = x1 + 1; i < x2; i++)
     {
-       bc_printA(HORIZONTAL);
+		mt_gotoXY(i, y1);
+    	bc_printA(HORIZONTAL);
+		mt_gotoXY(i, y2);
+    	bc_printA(HORIZONTAL);
     }
-    bc_printA(RIGHT_UPPER_CORNER);
     for (int i = y1 +1; i < y2; i++)
 	{
 		mt_gotoXY(x1, i);
@@ -26,11 +36,7 @@ int bc_box(int x1, int y1, int x2, int y2) {
 		mt_gotoXY(x2, i);
 		bc_printA(VERTICAL);
 	}
-    mt_gotoXY(x1, y2);
-	bc_printA(LEFT_BOTTOM_CORNER);
-	for (int i = x1 + 1; i < x2; i++)
-		bc_printA(HORIZONTAL);
-	bc_printA(RIGHT_BOTTOM_CORNER);
+    
     return 0;
 }
 
