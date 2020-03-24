@@ -3,6 +3,8 @@
         "stdio.h": "c",
         "myterm.h": "c",
         "memory.h": "c",
-        "ioctl.h": "c"
+        "ioctl.h": "c",
+        "mybigchars.h": "c",
+        "types.h": "c"
     }
 }

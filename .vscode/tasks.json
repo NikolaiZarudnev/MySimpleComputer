@@ -6,9 +6,19 @@
         {
             "type": "shell",
             "label": "gcc build active file",
-            "command": "make",
+            "command": "gcc",
             "args": [
-                "${fileDirname}"
+                "-std=c11",
+                "-Wextra",
+                "-g", 
+                "-Wall",  
+                "${fileDirname}/main.c", 
+                "${fileDirname}/memory.c", 
+                "${fileDirname}/myTerm.c", 
+                "${fileDirname}/myBigChars.c",
+                "${fileDirname}/interface.c",
+                "-o", 
+                "${fileDirname}/main"
             ],
             "options": {
                 "cwd": "/usr/bin"
