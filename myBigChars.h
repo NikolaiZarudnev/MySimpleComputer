@@ -13,7 +13,7 @@
 #define HORIZONTAL "q"
 #define RECTANGLE "a"
 
-int bc_printA (char * str);/*выводит строку символов с использованием дополнительной кодировочной таблицы;*/
+int bc_printA (char * str);
 int bc_box(int x1, int y1, int x2, int y2);
 int bc_printbigchar(int *big, int x, int y, enum colors fg, enum colors bg);/* -
 выводит на экран "большой символ" размером восемь строк на восемь столбцов, левый
@@ -24,15 +24,9 @@ int bc_printbigchar(int *big, int x, int y, enum colors fg, enum colors bg);/* -
 строке выводятся 8 младших бит второго числа и т.д. При этом если значение бита = 0,
 то выводится символ "пробел", иначе - символ, закрашивающий знакоместо
 (ACS_CKBOARD);*/
-int bc_setbigcharpos (int * big, int x, int y, int value);/* - устанавли-
-вает значение знакоместа "большого символа" в строке x и столбце y в значение value;*/
-int bc_getbigcharpos(int * big, int x, int y, int *value);/* - возвращает
-значение позиции в "большом символе" в строке x и столбце y;*/
-int bc_bigcharwrite (int fd, int * big, int count);/* - записывает заданное
-число "больших символов" в файл. Формат записи определяется пользователем;*/
-int bc_bigcharread (int fd, int * big, int need_count, int * count);/*
-считывает из файла заданное количество "больших символов". Третий параметр ука-
-зывает адрес переменной, в которую помещается количество считанных символов или
-0, в случае ошибки.
-Все функции возвращают 0 в случае успешного выполнения и -1 в случае ошибки. В каче-
+int bc_setbigcharpos (int * big, int x, int y, int value);
+int bc_getbigcharpos(int * big, int x, int y, int *value);
+int bc_bigcharwrite (int fd, int * big, int count);
+int bc_bigcharread (int fd, int * big, int need_count, int * count);
+/*Все функции возвращают 0 в случае успешного выполнения и -1 в случае ошибки. В каче-
 стве терминала используется стандартный поток вывода.*/

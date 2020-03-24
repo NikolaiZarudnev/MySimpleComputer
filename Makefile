@@ -1,5 +1,5 @@
 FLAGS:= -Wall -c
-CC:= gcc
+CC:= gcc -g3
 
 main.o: main.c
 	$(CC) $(FLAGS) main.c
@@ -8,6 +8,9 @@ memory.o: memory.c
 myTerm.o: myTerm.c
 	$(CC) $(FLAGS) myTerm.c
 myBigChars.o: myBigChars.c
-SimpleComputer: main.o myTerm.o memory.o myBigChars.o
-	$(CC) -o main main.o memory.o myTerm.o myBigChars.o
+	$(CC) $(FLAGS) myBigChars.c
+interface.o: interface.c
+	$(CC) $(FLAGS) interface.c
+SimpleComputer: main.o myTerm.o memory.o myBigChars.o interface.o
+	$(CC) -o main main.o memory.o myTerm.o myBigChars.o interface.o
 	rm -rf *.o
