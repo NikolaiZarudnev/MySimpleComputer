@@ -1,4 +1,3 @@
-#pragma once
 #include "interface.h"
 
 void I_viewMySC() {
@@ -56,9 +55,8 @@ void I_viewMySC() {
     printf("F6 - instructionCount");
 }
 
-void I_InstrCounter () {
-    mt_gotoXY(99, 7);
-    printf("+0000");
+void I_InstrCounter (int value) {
+    I_PrintMemoryCase(99, 7, value, 0);
 }
 
 void I_Operation () {
@@ -71,70 +69,64 @@ void I_Flags () {
     printf("O E V M");
 }
 
-void I_Memory () {
-    int *value = malloc(sizeof(int));
-    int paddingX = 0;
+void I_PrintMemoryCase(int x, int y, int value, int selected) {
+    
     int temp_value = 0;
     int digit = 1;
-    for (int i = 0; i < SIZE; i++)
+    mt_gotoXY(x, y);
+    if (selected == 1)
     {
-        if (i % 10 == 0)
-        {
-            paddingX += 7;
-        }
-        mt_gotoXY(4 + i / 10 + paddingX, 3 + i % 10);
-        
-        sc_memoryGet(i, value);
-        temp_value = *value;
-        digit = 1;
-        while(temp_value / 10 != 0) {
-            digit++;
-            temp_value /= 10;
-        }
-        printf("+");
-        for (int i = 0; i < 4 - digit; i++)
-        {
-            if (4 - digit < 0)
-            {
-                printf("*!");
-                mt_gotoXY(0, 38);
-                printf("\nError *!: digit < 0\n");
-                mt_gotoXY(4 + i / 10 + paddingX, 3 + i % 10);
-                break;
-            }
-            printf("0");
-        }
-        printf("%d", *value);
+        mt_setfgcolor(cl_black);
+	    mt_setbgcolor(cl_green);
     }
-}
-
-void I_Accumulator (int *value) {
-    int temp_value = 0;
-    int digit = 1;
-    mt_gotoXY(99, 3);
-    temp_value = *value;
+    temp_value = value;
     digit = 1;
     while(temp_value / 10 != 0) {
         digit++;
         temp_value /= 10;
     }
     printf("+");
-    for (int i = 0; i < 4 - digit; i++)
+    for (int j = 0; j < 4 - digit; j++)
     {
+        /*
         if (4 - digit < 0)
         {
             printf("*!");
             mt_gotoXY(0, 38);
             printf("\nError *!: digit < 0\n");
-            mt_gotoXY(99, 3);
+            mt_gotoXY(x, y);
             break;
         }
+        */
         printf("0");
     }
-    printf("%d", *value);
+    printf("%d", value);
+    mt_setfgcolor(cl_green);
+	mt_setbgcolor(cl_black);
 }
 
-void I_BigCharNumber (int *value) {
+void I_Memory () {
+    int paddingX = 0;
+    int x, y;
+    int *value = malloc(sizeof(int));
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (i % 10 == 0)
+        {
+            paddingX += 7;
+        }
+        x = 4 + i / 10 + paddingX;
+        y = 3 + i % 10;
+        sc_memoryGet(i, value);
+        I_PrintMemoryCase(x, y, *value, 0);
+    }
+}
+
+void I_Accumulator (int value) {
+    I_PrintMemoryCase(99, 3, value, 0);
+}
+
+int I_BigCharNumber (int *value) {
     char str[5] = "00000";
     int temp_value = *value;
     str[0] = '+';
@@ -158,14 +150,14 @@ void I_BigCharNumber (int *value) {
 			bigchar[0] = 0x10101010;
             bigchar[1] = 0x101010FF;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
             }
 			break;
 		case '0':
             bigchar[0] = 0x818181FF;
             bigchar[1] = 0xFF818181;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '1':
@@ -173,7 +165,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x12141810;
             bigchar[1] = 0x10101010;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '2':
@@ -181,7 +173,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x3060C3FF;
             bigchar[1] = 0xFF03060C;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '3':
@@ -189,7 +181,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x3060C0FF;
             bigchar[1] = 0xFFC06030;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '4':
@@ -197,7 +189,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x81818181;
             bigchar[1] = 0x808080FF;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '5':
@@ -205,7 +197,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0xFF0101FF;
             bigchar[1] = 0xFF808080;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '6':
@@ -213,7 +205,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x10101FF;
             bigchar[1] = 0xFF8181FF;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '7':
@@ -221,7 +213,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x3060C0FF;
             bigchar[1] = 0x3060C18;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '8':
@@ -229,7 +221,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0x818181FF;
             bigchar[1] = 0xFF8181FF;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		case '9':
@@ -237,7 +229,7 @@ void I_BigCharNumber (int *value) {
             bigchar[0] = 0xFF8181FF;
             bigchar[1] = 0x183060C0;
 			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return 1;
+				return -1;
 			}
 			break;
 		default:
@@ -246,4 +238,5 @@ void I_BigCharNumber (int *value) {
         }
         x += 9;
     }
+    return 0;
 }

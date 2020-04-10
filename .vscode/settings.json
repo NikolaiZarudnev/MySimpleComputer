@@ -5,6 +5,8 @@
         "memory.h": "c",
         "ioctl.h": "c",
         "mybigchars.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "type_traits": "c",
+        "controller.h": "c"
     }
 }

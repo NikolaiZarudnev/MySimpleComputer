@@ -16,7 +16,9 @@
                 "${fileDirname}/memory.c", 
                 "${fileDirname}/myTerm.c", 
                 "${fileDirname}/myBigChars.c",
+                "${fileDirname}/myReadKey.c",
                 "${fileDirname}/interface.c",
+                "${fileDirname}/controller.c",
                 "-o", 
                 "${fileDirname}/main"
             ],
