@@ -1,13 +1,5 @@
 #include "controller.h"
-void clearInOut() {
-    mt_setbgcolor(cl_default);
-    mt_setfgcolor(cl_default);
-    mt_gotoXY(0, 38);
-    printf("\t\t\t\t\t\t\t\t\t");
-    mt_gotoXY(0, 39);
-    printf("\t\t\t\t\t\t\t\t\t");
-    mt_gotoXY(0, 38);
-}
+
 void ctrl_Controller(int key, int *x, int *y, int *addres) {
     
     int *value = malloc(sizeof(int));
@@ -19,7 +11,15 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         printf("Write the filename: ");
         scanf("%s", filename);
         strcat(filename, path);
-        sc_memoryLoad(filename);
+        if(sc_memoryLoad(filename) == -1) {
+            mt_setbgcolor(cl_default);
+            mt_setfgcolor(cl_default);
+            mt_gotoXY(0, 39);
+            printf("file not exist");
+            mt_setbgcolor(cl_black);
+            mt_setfgcolor(cl_green);
+            break;
+        }
         I_Memory();
         mt_setbgcolor(cl_default);
         mt_setfgcolor(cl_default);

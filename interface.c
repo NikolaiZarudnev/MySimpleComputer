@@ -1,10 +1,18 @@
 #include "interface.h"
 
+void clearInOut() {
+    mt_setbgcolor(cl_default);
+    mt_setfgcolor(cl_default);
+    mt_gotoXY(0, 38);
+    printf("                                            \n");
+    printf("                                            ");
+    mt_gotoXY(0, 38);
+    fflush(stdout);
+}
 void I_viewMySC() {
     mt_clrscr();
     mt_setfgcolor(cl_green);
 	mt_setbgcolor(cl_black);
-    
     for (size_t i = 2; i < 127; i++)
     {
         for (size_t j = 1; j < 36; j++)
@@ -53,6 +61,8 @@ void I_viewMySC() {
     printf("F5 - accumulator");
     mt_gotoXY(75, 26);
     printf("F6 - instructionCount");
+    mt_gotoXY(75, 27);
+    printf("q - exit");
 }
 
 void I_InstrCounter (int value) {

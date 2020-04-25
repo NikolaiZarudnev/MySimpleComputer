@@ -2,6 +2,8 @@
 #include "myTerm.h"
 #include "memory.h"
 #include <stdlib.h>
+
+void clearInOut();
 void I_viewMySC();
 void I_InstrCounter (int value);
 void I_Operation ();
