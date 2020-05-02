@@ -76,6 +76,22 @@ void I_Operation () {
 
 void I_Flags () {
     mt_gotoXY(100, 15);
+    for (int i = 1, xflags = 100; i <= 32; i*=2, xflags++) {
+            if(sc_regGet(2, &i)==1) {
+                mt_gotoXY(xflags, 15);
+                mt_setfgcolor(cl_black);
+	            mt_setbgcolor(cl_green);
+                fflush(stdout);
+                xflags++;
+                mt_gotoXY(xflags, 15);
+                mt_setfgcolor(cl_green);
+	            mt_setbgcolor(cl_black);
+                fflush(stdout);
+            } else {
+                xflags++;
+            }
+            
+        }
     printf("O E V M");
 }
 

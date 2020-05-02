@@ -34,7 +34,7 @@ int main() {
     I_Flags ();
     I_Accumulator (0);
     I_BigCharNumber (value);
-    
+    sc_regInit();
     mt_gotoXY(0, 37);
     printf("Input/Output");
     mt_gotoXY(0, 38);
@@ -42,7 +42,8 @@ int main() {
         fflush(stdout);
         rk_readkey(key);
         ctrl_Controller(*key, x, y, addres);
-        
+        //перенести в i_flag()
+        I_Flags ();
     }
     check = rk_mytermregime(1, 0, 1, 0, 0);
     printf("%d\n", check);
