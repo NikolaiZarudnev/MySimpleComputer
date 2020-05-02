@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <signal.h>
 #include <fcntl.h>
 #include "memory.h"
 #include "myTerm.h"
@@ -9,6 +11,23 @@
 #include "interface.h"
 #include "myReadKey.h"
 #include "controller.h"
+
+void signalhandler (int signo){
+    static int insrtuctionCounter = 0;
+    I_InstrCounter(++insrtuctionCounter);
+}
+void signalhandlerreset(int sig) {
+    int *val = malloc(sizeof(int));
+    *val = 0;
+    sc_memoryInit();
+    I_Memory ();
+    I_Operation();
+    I_InstrCounter(*val);
+    I_Flags ();
+    I_Accumulator(*val);
+    I_BigCharNumber(val);
+    free(val);
+}
 int main() {
     //rk_mytermregime(1, 0, 1, 1, 0);
     int *x = malloc(sizeof(int));
@@ -38,11 +57,20 @@ int main() {
     mt_gotoXY(0, 37);
     printf("Input/Output");
     mt_gotoXY(0, 38);
+    struct itimerval nval, oval;
+    signal (SIGALRM, signalhandler);
+    nval.it_interval.tv_sec = 1;
+    nval.it_interval.tv_usec = 500;
+    nval.it_value.tv_sec = 3;
+    nval.it_value.tv_usec = 500;
+    /* Запускаем таймер */
+    //setitimer (ITIMER_REAL, &nval, &oval);
+    signal (SIGUSR1, signalhandlerreset);
     while (1) {
         fflush(stdout);
         rk_readkey(key);
         ctrl_Controller(*key, x, y, addres);
-        //перенести в i_flag()
+        //fix
         I_Flags ();
     }
     check = rk_mytermregime(1, 0, 1, 0, 0);

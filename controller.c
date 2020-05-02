@@ -46,14 +46,7 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         /* code */
         break;
     case KEY_i:
-        sc_memoryInit();
-        I_Memory ();
-        I_Operation();
-        I_InstrCounter(*value);
-        I_Flags ();
-        I_Accumulator(*value);
-        I_BigCharNumber(value);
-        free(value);
+        raise(SIGUSR1);
         break;
     case KEY_q:
         rk_mytermregime(0, 0, 0, 0, 0);
