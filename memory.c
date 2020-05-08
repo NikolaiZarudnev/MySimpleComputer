@@ -71,21 +71,27 @@ int sc_regSet(int reg, int value) {
 }
 
 int checkFlag(int value) {
-    if (value == 1)
-    {
+    if (value == 1) {
        return 1;
     }
-    if (value % 2 == 0)
-    {
+    if (value % 2 == 0) {
         checkFlag(value / 2);
+    } else {
+        return 0;
     }
-    return 0;
+    return 1;
 }
 /*возвращает значение указанного флага*/
 int sc_regGet(int reg, int* value) {
     if (checkFlag(*value) && *value >= 1 && *value <= 32) //._.
     {
-        return (reg >> (*value - 1)) && 0x1;
+        /* return 1(true) если есть такой флаг
+        int t1 = *value - 1;
+        int t2 = reg >> t1;
+        int t3 = t2 & 0x1;
+        */
+        //return значени флага
+        return reg & *value;
     }
     return F_WRONG_FLAG;
 }

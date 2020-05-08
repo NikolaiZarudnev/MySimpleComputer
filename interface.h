@@ -7,7 +7,7 @@ void clearInOut();
 void I_viewMySC();
 void I_InstrCounter (int value);
 void I_Operation ();
-void I_Flags ();
+void I_Flags (int reg);
 void I_PrintMemoryCase(int x, int y, int value, int selected);
 void I_Memory ();
 void I_Accumulator (int value);

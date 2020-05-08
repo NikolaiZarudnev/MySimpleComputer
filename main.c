@@ -20,10 +20,11 @@ void signalhandlerreset(int sig) {
     int *val = malloc(sizeof(int));
     *val = 0;
     sc_memoryInit();
+    int reg = sc_regInit();
     I_Memory ();
     I_Operation();
     I_InstrCounter(*val);
-    I_Flags ();
+    I_Flags (reg);
     I_Accumulator(*val);
     I_BigCharNumber(val);
     free(val);
@@ -37,6 +38,7 @@ int main() {
     *y = 3;
     *addres = 0;
     int check;
+    int reg = sc_regInit();
     sc_memoryInit();
     char *path = "Storage.bin";
     sc_memoryLoad(path);
@@ -50,7 +52,7 @@ int main() {
     
     I_Operation();
     I_InstrCounter (0);
-    I_Flags ();
+    I_Flags (reg);
     I_Accumulator (0);
     I_BigCharNumber (value);
     sc_regInit();
@@ -66,21 +68,12 @@ int main() {
     /* Запускаем таймер */
     //setitimer (ITIMER_REAL, &nval, &oval);
     signal (SIGUSR1, signalhandlerreset);
+    reg = 2;
     while (1) {
         fflush(stdout);
         rk_readkey(key);
         ctrl_Controller(*key, x, y, addres);
-        //fix
-        I_Flags ();
+        I_Flags (reg);
     }
-    check = rk_mytermregime(1, 0, 1, 0, 0);
-    printf("%d\n", check);
-    check = rk_mytermsave();
-    printf("%d\n", check);
-    check = rk_mytermregime(0, 0, 0, 0, 0);
-    printf("%d\n", check);
-    check = rk_mytermrestore();
-    rk_mytermregime(0, 0, 0, 0, 0);
-    printf("%d\n", check);
     return 0;
 }

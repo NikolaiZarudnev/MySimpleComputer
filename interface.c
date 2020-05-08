@@ -74,25 +74,69 @@ void I_Operation () {
     printf("+00:00");
 }
 
-void I_Flags () {
-    mt_gotoXY(100, 15);
-    for (int i = 1, xflags = 100; i <= 32; i*=2, xflags++) {
-            if(sc_regGet(2, &i)==1) {
-                mt_gotoXY(xflags, 15);
+void I_Flags (int reg) {
+    int xposflag = 100;
+    mt_gotoXY(xposflag, 15);
+    
+    printf("П 0 M T E");
+    int check = 0;
+    for (int i = 1; i <= 32; i*=2) {
+        check = sc_regGet(reg, &i);
+        switch (check) {
+            case F_OVERFLOW:
                 mt_setfgcolor(cl_black);
 	            mt_setbgcolor(cl_green);
-                fflush(stdout);
-                xflags++;
-                mt_gotoXY(xflags, 15);
+                mt_gotoXY(xposflag, 15);
+                printf("П");
                 mt_setfgcolor(cl_green);
 	            mt_setbgcolor(cl_black);
+                mt_gotoXY(0, 38);
                 fflush(stdout);
-            } else {
-                xflags++;
-            }
-            
+                break;
+            case F_ZERODIV:
+                mt_setfgcolor(cl_black);
+	            mt_setbgcolor(cl_green);
+                mt_gotoXY(xposflag + 2, 15);
+                printf("0");
+                mt_setfgcolor(cl_green);
+	            mt_setbgcolor(cl_black);
+                mt_gotoXY(0, 38);
+                fflush(stdout);
+                break;
+            case F_OUT_OF_RANGE:
+                mt_setfgcolor(cl_black);
+	            mt_setbgcolor(cl_green);
+                mt_gotoXY(xposflag + 4, 15);
+                printf("M");
+                mt_setfgcolor(cl_green);
+	            mt_setbgcolor(cl_black);
+                mt_gotoXY(0, 38);
+                fflush(stdout);
+                break;
+            case F_IGNORE_TACT:
+                mt_setfgcolor(cl_black);
+	            mt_setbgcolor(cl_green);
+                mt_gotoXY(xposflag + 6, 15);
+                printf("T");;
+                mt_setfgcolor(cl_green);
+	            mt_setbgcolor(cl_black);
+                mt_gotoXY(0, 38);
+                fflush(stdout);
+                break;
+            case F_WRONG_COMMAND:
+                mt_setfgcolor(cl_black);
+	            mt_setbgcolor(cl_green);
+                mt_gotoXY(xposflag + 8, 15);
+                printf("E");
+                mt_setfgcolor(cl_green);
+	            mt_setbgcolor(cl_black);
+                mt_gotoXY(0, 38);
+                fflush(stdout);
+                break;
+            default:
+                break;
         }
-    printf("O E V M");
+    }
 }
 
 void I_PrintMemoryCase(int x, int y, int value, int selected) {
