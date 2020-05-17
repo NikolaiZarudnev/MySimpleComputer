@@ -11,11 +11,7 @@
 #include "interface.h"
 #include "myReadKey.h"
 #include "controller.h"
-
-void signalhandler (int signo){
-    static int insrtuctionCounter = 0;
-    I_InstrCounter(++insrtuctionCounter);
-}
+#include "simpleAssembleer.h"
 void signalhandlerreset(int sig) {
     int *val = malloc(sizeof(int));
     *val = 0;
@@ -30,6 +26,7 @@ void signalhandlerreset(int sig) {
     free(val);
 }
 int main() {
+    int asd = insrtuctionCounter;
     //rk_mytermregime(1, 0, 1, 1, 0);
     int *x = malloc(sizeof(int));
     int *y = malloc(sizeof(int));
@@ -66,7 +63,7 @@ int main() {
     nval.it_value.tv_sec = 3;
     nval.it_value.tv_usec = 500;
     /* Запускаем таймер */
-    //setitimer (ITIMER_REAL, &nval, &oval);
+    setitimer (ITIMER_REAL, &nval, &oval);
     signal (SIGUSR1, signalhandlerreset);
     reg = 2;
     while (1) {

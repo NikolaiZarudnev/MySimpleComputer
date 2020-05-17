@@ -7,6 +7,7 @@
         "mybigchars.h": "c",
         "types.h": "c",
         "type_traits": "c",
-        "controller.h": "c"
+        "controller.h": "c",
+        "simpleassembleer.h": "c"
     }
 }

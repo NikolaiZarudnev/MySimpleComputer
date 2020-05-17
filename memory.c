@@ -1,6 +1,4 @@
 #include "memory.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 int register_flags = 0;
 int memory[SIZE];
@@ -95,7 +93,7 @@ int sc_regGet(int reg, int* value) {
     }
     return F_WRONG_FLAG;
 }
-const int commandsOK[] = {10, 11, 20, 21, 30, 31, 32, 33, 40, 41, 42, 43};
+const int commandsOK[] = {30};
 /*кодирует команду с указанным номером и операндом и помещает результат в value*/
 int sc_commandEncode(int command, int operand, int *value) {
     int check = 0;
