@@ -20,7 +20,8 @@ enum keys {
 	KEY_left,
 	KEY_right,
 	KEY_enter,
-	KEY_other
+	KEY_other,
+	KEY_p
 };
 
 int rk_readkey (int *key);

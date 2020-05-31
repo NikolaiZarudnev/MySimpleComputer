@@ -10,7 +10,7 @@ int rk_readkey (int *key) {
 	char buf[8];
 	int num_read;
 	mt_gotoXY(0, 38);
-	rk_mytermregime(1, 0, 1, 0, 0);
+	rk_mytermregime(1, 5, 0, 0, 1);
 	num_read = read(STDIN_FILENO, buf, 15);
 	if (num_read < 0)
 		return -1;
@@ -41,6 +41,8 @@ int rk_readkey (int *key) {
 		*key = KEY_right;
 	else if (strcmp(buf, "\033[D") == 0)
 		*key = KEY_left;
+	else if (strcmp(buf, "p") == 0)
+		*key = KEY_p;
 	else
         *key = KEY_other;
 	rk_mytermregime(0, 0, 0, 0, 0);
@@ -82,27 +84,32 @@ int rk_mytermrestore () {
     sigint - когда принимаются любые символы из INTR, QUIT, SUSP, DSUSP,
     то генерировать соответствующий сигнал.
 */
-int rk_mytermregime (int regime, int vtime, int vmin, int echo, int sigint) {
-    struct termios new_options;
-	tcgetattr(STDIN_FILENO, &orig_options);
-	new_options = orig_options;
-	if (regime == 1) {
-        new_options.c_lflag &= ~(ECHO|ICANON|ISIG);
-		new_options.c_cc[VTIME] = vtime;
-		new_options.c_cc[VMIN] = vmin;
-        if (echo == 1)
-            new_options.c_lflag |= ECHO;
-        if (sigint == 1)
-            new_options.c_lflag |= ISIG;
-	} else if (regime == 0) {
-		orig_options.c_lflag |= (ECHO|ICANON|ISIG);
-        tcsetattr(STDIN_FILENO, TCSADRAIN, &orig_options);
-		
+int rk_mytermregime(int regime, int vtime, int vmin, int echo, int sigint)
+{
+    struct termios Settings;
+    tcgetattr(STDIN_FILENO, &orig_options);
+    Settings = orig_options;
+    if (regime == 1)
+    {
+        Settings.c_lflag &= (~ICANON);
+        if (sigint == 0) {
+            Settings.c_lflag &= (~ISIG);
+        } else if (sigint == 1) {
+            Settings.c_lflag |= ISIG;
+        }
+        if (echo == 0) {
+            Settings.c_lflag &= (~ECHO);
+        } else if (echo == 1) {
+            Settings.c_lflag |= ECHO;
+        }
+        Settings.c_cc[VMIN] = vmin;
+        Settings.c_cc[VTIME] = vtime;
+    } else if (regime == 0) {
+        orig_options.c_lflag |= (ICANON | ECHO | ISIG);
+		tcsetattr(0, TCSADRAIN, &orig_options);
 		return 0;
-    } else {
-        return -1;
     }
-    
-    tcsetattr(STDIN_FILENO, TCSADRAIN, &new_options);
-	return 0;
+
+    tcsetattr(0, TCSADRAIN, &Settings);
+    return 0;
 }

@@ -1,16 +1,17 @@
 #include "controller.h"
+struct itimerval nval, oval;
 
 void ctrl_Controller(int key, int *x, int *y, int *addres) {
     
     int *value = malloc(sizeof(int));
-    char *path = ".bin";
+    //char *path = "";
     char filename[16];
     switch (key) {
     case KEY_l:
         clearInOut();
         printf("Write the filename: ");
         scanf("%s", filename);
-        strcat(filename, path);
+        //strcat(filename, path);
         if(sc_memoryLoad(filename) == -1) {
             mt_setbgcolor(cl_default);
             mt_setfgcolor(cl_default);
@@ -32,7 +33,7 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         clearInOut();
         printf("Write the filename: ");
         scanf("%s", filename);
-        strcat(filename, path);
+        //strcat(filename, path);
         sc_memorySave(filename);
         mt_gotoXY(0, 39);
         printf("saved");
@@ -40,10 +41,24 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         mt_setfgcolor(cl_green);
         break;
     case KEY_r:
-        /* code */
+        signal(SIGVTALRM, inst_counter);
+        nval.it_interval.tv_sec = 1;
+        nval.it_interval.tv_usec = 0;
+        nval.it_value.tv_sec = 1;
+        nval.it_value.tv_usec = 0;
+        /* Запускаем таймер */
+        setitimer (ITIMER_VIRTUAL, &nval, &oval);
+        while (!cpu_getflagCPU()) {
+            signal(SIGVTALRM, inst_counter);
+            //rk_readkey(key_pause);
+            //if (*key_pause == KEY_p) {
+            //    alarm(0);
+            //    break;
+            //}
+        }
         break;
     case KEY_t:
-        /* code */
+        inst_counter(1);
         break;
     case KEY_i:
         raise(SIGUSR1);
@@ -55,19 +70,34 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         exit(1);
         break;
     case KEY_f5:
-        /* code */
-        break;
-    case KEY_f6:
         clearInOut();
-        printf("InstructionCounter < +");
+        printf("Accumulator < ");
         scanf("%d", value);
+        cpu_setAccumulator(*value);
         mt_setbgcolor(cl_black);
         mt_setfgcolor(cl_green);
         I_InstrCounter(*value);
         mt_setbgcolor(cl_default);
         mt_setfgcolor(cl_default);
         mt_gotoXY(0, 39);
-        printf("InstructionCounter > +%x", *value);
+        printf("Accumulator > %x", *value);
+        mt_setbgcolor(cl_black);
+        mt_setfgcolor(cl_green);
+        free(value);
+        break;
+        break;
+    case KEY_f6:
+        clearInOut();
+        printf("InstructionCounter < ");
+        scanf("%d", value);
+        cpu_setInstructionCounter(*value);
+        mt_setbgcolor(cl_black);
+        mt_setfgcolor(cl_green);
+        I_InstrCounter(*value);
+        mt_setbgcolor(cl_default);
+        mt_setfgcolor(cl_default);
+        mt_gotoXY(0, 39);
+        printf("InstructionCounter > %x", *value);
         mt_setbgcolor(cl_black);
         mt_setfgcolor(cl_green);
         free(value);
@@ -80,10 +110,10 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
             break;
         }
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y + 1, *value, 0);
+        I_PrintMemoryCase(*x, *y + 1, *value, 0, 1);
         *addres = *addres - 1;
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y, *value, 1);
+        I_PrintMemoryCase(*x, *y, *value, 1, 1);
         free(value);
         break;
     case KEY_down:
@@ -94,10 +124,10 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
             break;
         }
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y - 1, *value, 0);
+        I_PrintMemoryCase(*x, *y - 1, *value, 0, 1);
         *addres = *addres + 1;
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y, *value, 1);
+        I_PrintMemoryCase(*x, *y, *value, 1, 1);
         free(value);
         break;
     case KEY_left:
@@ -108,10 +138,10 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
             break;
         }
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x + 8, *y, *value, 0);
+        I_PrintMemoryCase(*x + 8, *y, *value, 0, 1);
         *addres = *addres - 10;
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y, *value, 1);
+        I_PrintMemoryCase(*x, *y, *value, 1, 1);
         free(value);
         break;
     case KEY_right:
@@ -122,22 +152,22 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
             break;
         }
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x - 8, *y, *value, 0);
+        I_PrintMemoryCase(*x - 8, *y, *value, 0, 1);
         *addres = *addres + 10;
         sc_memoryGet(*addres, value);
-        I_PrintMemoryCase(*x, *y, *value, 1);
+        I_PrintMemoryCase(*x, *y, *value, 1, 1);
         free(value);
         break;
     case KEY_enter:
         clearInOut();
         printf("%d < +", *addres);
-        scanf("%d", value);
+        scanf("%x", value);
         sc_memorySet(*addres, *value);
-        I_PrintMemoryCase(*x, *y, *value, 1);
+        I_PrintMemoryCase(*x, *y, *value, 1, 1);
         mt_setbgcolor(cl_default);
         mt_setfgcolor(cl_default);
         mt_gotoXY(0, 39);
-        printf("%d > +%x", *addres, *value);
+        printf("%d > %x", *addres, *value);
         mt_setbgcolor(cl_black);
         mt_setfgcolor(cl_green);
         free(value);

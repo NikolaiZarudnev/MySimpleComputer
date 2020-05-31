@@ -11,7 +11,7 @@
 #include "interface.h"
 #include "myReadKey.h"
 #include "controller.h"
-#include "simpleAssembleer.h"
+#include "CU.h"
 void signalhandlerreset(int sig) {
     int *val = malloc(sizeof(int));
     *val = 0;
@@ -25,8 +25,9 @@ void signalhandlerreset(int sig) {
     I_BigCharNumber(val);
     free(val);
 }
+
 int main() {
-    int asd = insrtuctionCounter;
+
     //rk_mytermregime(1, 0, 1, 1, 0);
     int *x = malloc(sizeof(int));
     int *y = malloc(sizeof(int));
@@ -34,16 +35,13 @@ int main() {
     *x = 11;
     *y = 3;
     *addres = 0;
-    int check;
+
     int reg = sc_regInit();
     sc_memoryInit();
-    char *path = "Storage.bin";
-    sc_memoryLoad(path);
     int *value = malloc(sizeof(int));
     int *key = malloc(sizeof(int));
     *key = 9;
     mt_clrscr();
-    
     I_viewMySC();
     I_Memory ();
     
@@ -56,21 +54,18 @@ int main() {
     mt_gotoXY(0, 37);
     printf("Input/Output");
     mt_gotoXY(0, 38);
-    struct itimerval nval, oval;
-    signal (SIGALRM, signalhandler);
-    nval.it_interval.tv_sec = 1;
-    nval.it_interval.tv_usec = 500;
-    nval.it_value.tv_sec = 3;
-    nval.it_value.tv_usec = 500;
-    /* Запускаем таймер */
-    setitimer (ITIMER_REAL, &nval, &oval);
+    
     signal (SIGUSR1, signalhandlerreset);
-    reg = 2;
+    
+    //signal (SIGUSR2, stop_timer);
+    fflush(stdout);
     while (1) {
-        fflush(stdout);
+        
         rk_readkey(key);
         ctrl_Controller(*key, x, y, addres);
         I_Flags (reg);
+        
+        fflush(stdout);
     }
     return 0;
 }

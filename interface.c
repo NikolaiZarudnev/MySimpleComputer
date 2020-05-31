@@ -66,7 +66,7 @@ void I_viewMySC() {
 }
 
 void I_InstrCounter (int value) {
-    I_PrintMemoryCase(99, 7, value, 0);
+    I_PrintMemoryCase(99, 7, value, 0, 0);
 }
 
 void I_Operation () {
@@ -77,7 +77,8 @@ void I_Operation () {
 void I_Flags (int reg) {
     int xposflag = 100;
     mt_gotoXY(xposflag, 15);
-    
+    mt_setfgcolor(cl_green);
+	mt_setbgcolor(cl_black);
     printf("П 0 M T E");
     int check = 0;
     for (int i = 1; i <= 32; i*=2) {
@@ -139,15 +140,17 @@ void I_Flags (int reg) {
     }
 }
 
-void I_PrintMemoryCase(int x, int y, int value, int selected) {
+void I_PrintMemoryCase(int x, int y, int value, int selected, int iscommand) {
     
     int temp_value = 0;
     int digit = 1;
     mt_gotoXY(x, y);
-    if (selected == 1)
-    {
+    if (selected == 1) {
         mt_setfgcolor(cl_black);
 	    mt_setbgcolor(cl_green);
+    } else {
+        mt_setfgcolor(cl_green);
+	    mt_setbgcolor(cl_black);
     }
     temp_value = value;
     digit = 1;
@@ -155,9 +158,14 @@ void I_PrintMemoryCase(int x, int y, int value, int selected) {
         digit++;
         temp_value /= 10;
     }
-    printf("+");
-    for (int j = 0; j < 4 - digit; j++)
-    {
+    if (iscommand == 1) {
+        printf("+");
+    } else {
+        x += 1;
+        mt_gotoXY(x, y);
+    }
+    
+    for (int j = 0; j < 4 - digit; j++) {
         /*
         if (4 - digit < 0)
         {
@@ -179,6 +187,8 @@ void I_Memory () {
     int paddingX = 0;
     int x, y;
     int *value = malloc(sizeof(int));
+    int *command = malloc(sizeof(int));
+    int *operand = malloc(sizeof(int));
     for (int i = 0; i < SIZE; i++)
     {
         if (i % 10 == 0)
@@ -188,12 +198,16 @@ void I_Memory () {
         x = 4 + i / 10 + paddingX;
         y = 3 + i % 10;
         sc_memoryGet(i, value);
-        I_PrintMemoryCase(x, y, *value, 0);
+        if (sc_commandDecode(*value, command, operand, 1) == -1) {
+            I_PrintMemoryCase(x, y, *value, 0, 0);
+        } else {
+            I_PrintMemoryCase(x, y, *value, 0, 1);
+        }
     }
 }
 
 void I_Accumulator (int value) {
-    I_PrintMemoryCase(99, 3, value, 0);
+    I_PrintMemoryCase(99, 3, value, 0, 0);
 }
 
 int I_BigCharNumber (int *value) {

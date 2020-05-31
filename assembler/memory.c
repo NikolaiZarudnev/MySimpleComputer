@@ -1,8 +1,8 @@
 #include "memory.h"
 
-
-int memory[SIZE];
 int register_flags = 0;
+int memory[SIZE];
+
 /*инициализирует оперативную память Simple Computer*/
 int sc_memoryInit() {
     for (int i = 0; i < SIZE; i++)
@@ -94,18 +94,10 @@ int sc_regGet(int reg, int* value) {
     sc_regSet(register_flags, F_WRONG_FLAG);
     return -1;
 }
-const int commandsOK[] = {0x0F, 0x10, 0x11, 0x20, 0x21, 0x30, 0x31, 0x32, 0x33, 0x40, 0x41, 0x42, 0x43, 0x51, 0x55};//убрать вариант
+const int commandsOK[] = {0x10, 0x11, 0x20, 0x21, 0x30, 0x31, 0x32, 0x33, 0x40, 0x41, 0x42, 0x43, 0x51, 0x55};//убрать вариант
 /*кодирует команду с указанным номером и операндом и помещает результат в value*/
 int sc_commandEncode(int command, int operand, int *value) {
     int check = 0;
-    if (command == 0x0F) {
-        command &= 128;
-        command = command << 7;
-        command = command | operand;
-        *value = command;
-        return 1;
-    }
-    
 	for (int i = 0; commandsOK[i] != 0x55; i++) {
 		if (commandsOK[i] == command) {
 			check = 1;
@@ -123,11 +115,9 @@ int sc_commandEncode(int command, int operand, int *value) {
     return 1;
 }
 /*декодирует значение как команду Simple Computer*/
-int sc_commandDecode(int value, int *command, int *operand, int ignore_reg) {
+int sc_commandDecode(int value, int *command, int *operand) {
     if (value >> 14 != 0) {
-        if (!ignore_reg) {
-            sc_regSet(register_flags, F_WRONG_COMMAND);
-        }
+        sc_regSet(register_flags, F_WRONG_COMMAND);
         return -1;
     }
     int comtemp = (value >> 7) & 127;
@@ -139,9 +129,7 @@ int sc_commandDecode(int value, int *command, int *operand, int ignore_reg) {
 		}
 	}
     if (!check) {
-        if (!ignore_reg) {
-            sc_regSet(register_flags, F_WRONG_COMMAND);
-        }
+        sc_regSet(register_flags, F_WRONG_COMMAND);
         return -1;
     }
     

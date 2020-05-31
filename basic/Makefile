@@ -15,14 +15,12 @@ interface.o: interface.c
 	$(CC) $(FLAGS) interface.c
 controller.o: controller.c
 	$(CC) $(FLAGS) controller.c
-CU.o: CU.c
-	$(CC) $(FLAGS) CU.c
 simpleBasic.o: simpleBasic.c
 	$(CC) $(FLAGS) simpleBasic.c
 sbas: memory.o simpleBasic.o myTerm.o
 	$(CC) -o sba memory.o simpleBasic.o myTerm.o
 	rm -rf *.o
-SimpleComputer: main.o myTerm.o memory.o myBigChars.o myReadKey.o interface.o controller.o CU.o
-	$(CC) -o main main.o memory.o myTerm.o myBigChars.o myReadKey.o interface.o controller.o CU.o
+SimpleComputer: main.o myTerm.o memory.o myBigChars.o myReadKey.o interface.o controller.o
+	$(CC) -o main main.o memory.o myTerm.o myBigChars.o myReadKey.o interface.o controller.o
 	rm -rf *.o
 

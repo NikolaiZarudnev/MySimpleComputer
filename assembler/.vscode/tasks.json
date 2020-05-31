@@ -12,16 +12,11 @@
                 "-Wextra",
                 "-g", 
                 "-Wall",  
-                "${fileDirname}/main.c", 
+                "${fileDirname}/simpleAssembler.c", 
                 "${fileDirname}/memory.c", 
                 "${fileDirname}/myTerm.c", 
-                "${fileDirname}/myBigChars.c",
-                "${fileDirname}/myReadKey.c",
-                "${fileDirname}/interface.c",
-                "${fileDirname}/controller.c",
-                "${fileDirname}/CU.c",
                 "-o", 
-                "${fileDirname}/main"
+                "${fileDirname}/sat"
             ],
             "options": {
                 "cwd": "/usr/bin"

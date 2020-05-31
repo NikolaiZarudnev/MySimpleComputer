@@ -1,173 +1,124 @@
 #include "CU.h"
 enum Commands {
-    READ = 10,
+    ASSIGNMENT = 0X0F,
+    READ = 0x10,
     WRITE,
-    LOAD = 20,
+    LOAD = 0x20,
     STORE,
-    ADD = 30,
+    ADD = 0x30,
     SUB,
     DIVIDE,
     MUL,
-    JUMP = 40,
+    JUMP = 0x40,
     JNEG,
     JZ,
     HALT,
-    NOT = 51,
+    NOT = 0x51,
     AND,
     OR,
     XOR,
-    JNS,
-    JC,
-    JNC,
-    JP,
-    JNP,
-    CHL,
-    SHR,
-    RCL,
-    RCR,
-    NEG,
-    ADDC,
-    SUBC,
-    LOGLC,
-    LOGRC,
-    RCCL,
-    RCCR,
-    MOVA,
-    MOVR,
-    MOVCA,
-    MOVCR,
-    ADDCA,
-    SUBCA
+    JNS
 };
 
-int numCase(char *mcase) {
-    for (int i = 0; mcase[i] != '\0'; i++) {
-        if (isdigit(mcase[i]) == 0) {
-            //wrong command flag
-            return -1;
-        }
-    }
-    int value = atoi(mcase);
-    if (value > 99 || value < 0) {
-        //F_OUT_OF_RANGE or F_OVERFLOW???
-        return -1;
-    }
+int flag_stopCPU = 0;
+int insrtuctionCounter = 0;
+int accumulator = 0;
+int cpu_getflagCPU() {
+    int value = flag_stopCPU;
     return value;
 }
-int checkCommand() {
-    
+int cpu_getInstructionCounter(int *value) {
+    *value = insrtuctionCounter;
 }
-//
-int func2(char *str) {
-    char *memcase;
-    char *commandstr;
-    char *operandstr;
-    char delim = " ";
-    int len = 0;
-    for (; (str[len] != '\0') && (str[len] != ';') && (str[len] != '\n');) {
-        len++;
-        delim = str[len];
-    }
-    str[len] = '\0';
-    memcase = strtok(str, delim);
-    commandstr = strtok(str, delim);
-    operandstr = strtok(str, delim);
-    return 1;
+int cpu_setInstructionCounter(int value) {
+    insrtuctionCounter = value;
 }
-//бег по файлу
-int func() {
-    //чтение скрипта(только одна функция). кодирование команды и операнда -> помещение в оперативную память
-    FILE *fpin;
-    FILE *fpout;
-    char str[128];
-    if ((fpin=fopen("textin.txt", "r") )==NULL) {
-        printf("Cannot open file.\n");
-        return -1;
-    }
-    if ((fpout=fopen("textout.bin", "w+b") )==NULL) {
-        printf("Cannot open file.\n");
-        return -1;
-    }
-    while(!feof (fpin)) {
-        if (fgets(str, 126, fpin))
-            func2(str);
-            fwrite(str, sizeof(char), 126, fpout);
-            
-        }
-    fclose(fpin);
-    close(fpout);
-    return 0;
-    //
+int cpu_getAccumulator(int *value) {
+    *value = accumulator;
 }
-
-void signalhandler (int signo){
+int cpu_setAccumulator(int value) {
+    accumulator = value;
+}
+void inst_counter (int sig){
     //static int insrtuctionCounter = 0;
     I_InstrCounter(insrtuctionCounter);
-    insrtuctionCounter++;
+    if (insrtuctionCounter > 99) {
+        flag_stopCPU = 1;
+        alarm(0);
+    }
+    if(CU() == 0) {
+        flag_stopCPU = 1;
+        alarm(0);
+    }
+    
 }
+
 int CU() {
     int *value = malloc(sizeof(int));
     int *command = malloc(sizeof(int));
     int *operand = malloc(sizeof(int));
-    
-    sc_memoryGet(insrtuctionCounter, value);
-    sc_commandDecode(*value, command, operand);
-    if (*command >= 10 && *command <= 21 || *command >= 40 && *command <= 43 
-        || *command >= 55 && *command <= 59) {
+    int *tempVal1 = malloc(sizeof(int));
+    //while (insrtuctionCounter < 100) {
+        sc_memoryGet(insrtuctionCounter, value);
+        I_BigCharNumber(value);
+        if (sc_commandDecode(*value, command, operand, 0) == -1) {
+            clearInOut();
+            mt_setbgcolor(cl_black);
+            mt_setfgcolor(cl_green);
+            return 0;
+        }
         switch (*command) {
             case READ:
-                int *tempVal = malloc(sizeof(int));
                 clearInOut();
-                printf("%d < +", *operand);
-                scanf("%d", tempVal);
+                printf("%d < ", *operand);
+                scanf("%d", tempVal1);
                 //error flag oversize? overflow?
-                sc_memorySet(*operand, *value);
-                I_PrintMemoryCase(4 + *operand / 10 * 7, 3 + *operand % 10, *tempVal, 1);
-                mt_setbgcolor(cl_default);
-                mt_setfgcolor(cl_default);
-                mt_setbgcolor(cl_black);
-                mt_setfgcolor(cl_green);
-                free(tempVal);
+                sc_memorySet(*operand, *tempVal1);
+                I_PrintMemoryCase(4 + (*operand / 10 + 1) * 7 + *operand / 10, 3 + *operand % 10, *tempVal1, 0, 0);
+                fflush(stdout);
+                free(tempVal1);
                 break;
             case WRITE:
                 clearInOut();
-                printf("%d > +%x", *operand, *value);
+                sc_memoryGet(*operand, value);
+                printf("%d > %x", *operand, *value);
                 mt_setbgcolor(cl_black);
                 mt_setfgcolor(cl_green);
+                fflush(stdout);
                 break;
             case LOAD:
                 sc_memoryGet(*operand, &accumulator);
-                I_Accumulator(&accumulator);
+                I_Accumulator(accumulator);
+                 fflush(stdout);
                 break;
             case STORE:
                 sc_memorySet(*operand, accumulator);
-                I_PrintMemoryCase(4 + *operand / 10 * 7, 3 + *operand % 10, accumulator, 1);
-                mt_setbgcolor(cl_default);
-                mt_setfgcolor(cl_default);
+                I_PrintMemoryCase(4 + (*operand / 10 + 1) * 7 + *operand / 10, 3 + *operand % 10, accumulator, 0, 0);
                 mt_setbgcolor(cl_black);
                 mt_setfgcolor(cl_green);
                 break;
             case JUMP:
-                insrtuctionCounter = *operand;
+                insrtuctionCounter = *operand - 1;
                 break;
             case JNEG:
                 if (accumulator < 0) {
-                    insrtuctionCounter = *operand;
+                    insrtuctionCounter = *operand - 1;
                 }
                 break;
             case JZ:
                 if (accumulator == 0) {
-                    insrtuctionCounter = *operand;
+                    insrtuctionCounter = *operand - 1;
                 }
                 break;
             case HALT:
-                //остановить таймер или выключить?
+                return 0;
                 break;
             case JNS: //ТОЛЬКО ЭТА ФУНКЦИЯ
                 if (accumulator > 0) {
-                    insrtuctionCounter = *operand;
+                    insrtuctionCounter = *operand - 1;
                 }
                 break;
+            /*
             case JC:
                 if (accumulator > 9999) {
                     insrtuctionCounter = *operand;
@@ -178,56 +129,64 @@ int CU() {
                     insrtuctionCounter = *operand;
                 }
                 break;
+            
             case JP:
                 if (accumulator % 2 == 0) {
                     insrtuctionCounter = *operand;
                 }
                 break;
+            
             case JNP:
                 if (accumulator % 2 != 0) {
                     insrtuctionCounter = *operand;
                 }
                 break;
+            */
+            default:
+                ALU(*command, *operand);
+                break;
         }
-    } else {
-        ALU(*command, *operand);
-    }
+        fflush(stdout);
+        
+    //}
+    insrtuctionCounter++;
+    return 1;
 }
 int ALU(int command, int operand) {
+    int *tempVal = malloc(sizeof(int));
     switch (command)
     {
     case ADD:
-        int *tempVal = malloc(sizeof(int));
         sc_memoryGet(operand, tempVal);
         accumulator += *tempVal;
-        I_Accumulator(&accumulator);
+        I_Accumulator(accumulator);
         free(tempVal);
         break;
     case SUB:
-        int *tempVal = malloc(sizeof(int));
         sc_memoryGet(operand, tempVal);
         accumulator -= *tempVal;
-        I_Accumulator(&accumulator);
+        I_Accumulator(accumulator);
         free(tempVal);
         break;
     case DIVIDE:
-        int *tempVal = malloc(sizeof(int));
         sc_memoryGet(operand, tempVal);
         accumulator /= *tempVal;
-        I_Accumulator(&accumulator);
+        I_Accumulator(accumulator);
         free(tempVal);
         break;
     case MUL:
-        int *tempVal = malloc(sizeof(int));
         sc_memoryGet(operand, tempVal);
         accumulator *= *tempVal;
-        I_Accumulator(&accumulator);
+        I_Accumulator(accumulator);
         free(tempVal);
         break;
     case NOT: // ТОЛЬКО ЭТА ФУНКЦИЯ
-        sc_memorySet(operand, ~accumulator);
-        I_PrintMemoryCase(4 + operand / 10 * 7, 3 + operand % 10, ~accumulator, 1);
+        accumulator = ~accumulator;
+        I_Accumulator(accumulator);
+        sc_memorySet(operand, accumulator);
+        I_PrintMemoryCase(4 + operand / 10 * 7, 3 + operand % 10, ~accumulator, 0, 0);
         break;
+    /*
     case AND:
         int *tempVal = malloc(sizeof(int));
         sc_memoryGet(operand, tempVal);
@@ -381,6 +340,7 @@ int ALU(int command, int operand) {
         free(tempVal2);
         free(tempVal3);
         break;
+    */
     default:
         break;
     }
