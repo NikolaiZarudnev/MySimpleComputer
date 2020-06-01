@@ -144,6 +144,8 @@ void I_PrintMemoryCase(int x, int y, int value, int selected, int iscommand) {
     
     int temp_value = 0;
     int digit = 1;
+    int *command = malloc(sizeof(int));
+    int *operand = malloc(sizeof(int));
     mt_gotoXY(x, y);
     if (selected == 1) {
         mt_setfgcolor(cl_black);
@@ -160,7 +162,8 @@ void I_PrintMemoryCase(int x, int y, int value, int selected, int iscommand) {
     }
     if (iscommand == 1) {
         printf("+");
-        printf("%x", value);
+        sc_commandDecode(value, command, operand, 0);
+        printf("%x%x", *command, *operand);
         mt_setfgcolor(cl_green);
         mt_setbgcolor(cl_black);
         fflush(stdout);
