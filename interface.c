@@ -293,21 +293,37 @@ int *get_big(int digit) {
 //вывод биг чар
 void I_BigCharNumber(int value) {
 	int bigchar[2];
-
+    int *command = malloc(sizeof(int));
+    int *operand = malloc(sizeof(int));
 	bigchar[0] = 0x10101010;
     bigchar[1] = 0x101010FF;
     int x, y;
     int *b;
     int digit;
-    x = 5;
-    y = 20;
+    x = 7;
+    y = 22;
     mt_gotoXY(x, y);
     bc_printbigchar(bigchar, x, y, cl_green, cl_black);
     x = 14;
-	for(int i = 3; i >= 0; i--, x += 9) {
-		b = NULL;
-		digit = (value >> (4 * i)) & 0xF;
-		b = get_big(digit);
-		bc_printbigchar(b, x, y, cl_green, cl_black);
+    if (sc_commandDecode(value, command, operand, 0) == -1) {
+        for(int i = 3; i >= 0; i--, x += 9) {
+            b = NULL;
+            digit = (value >> (4 * i)) & 0xF;
+            b = get_big(digit);
+            bc_printbigchar(b, x, y, cl_green, cl_black);
+        }
+    } else {
+        for(int i = 1; i >= 0; i--, x += 9) {
+            b = NULL;
+            digit = (*command >> (4 * i)) & 0xF;
+            b = get_big(digit);
+            bc_printbigchar(b, x, y, cl_green, cl_black);
+        }
+        for(int i = 1; i >= 0; i--, x += 9) {
+            b = NULL;
+            digit = (*operand >> (4 * i)) & 0xF;
+            b = get_big(digit);
+            bc_printbigchar(b, x, y, cl_green, cl_black);
+        }
     }
 }

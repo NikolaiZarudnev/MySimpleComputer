@@ -59,6 +59,8 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         *value = 0;
         sc_memoryInit();
         int reg = sc_regInit();
+        mt_setbgcolor(cl_default);
+        mt_setfgcolor(cl_default);
         mt_clrscr();
         I_viewMySC();
         I_Memory ();
@@ -80,6 +82,7 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         rk_mytermregime(0, 0, 0, 0, 0);
         mt_setfgcolor(cl_default);
 	    mt_setbgcolor(cl_default);
+        mt_clrscr();
         exit(1);
         break;
     case KEY_f5:
