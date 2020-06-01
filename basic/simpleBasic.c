@@ -18,7 +18,7 @@ struct varlist varlist;
 char *sbline2saline[16];
 char *sa_jumpline[32];
 int sa_countjump = 0;
-int lineassemb_count = 0;
+int lineassemb_count = -1;//crutch
 char *endstr = "\n";
 
 char* itoa(int n) {
@@ -65,6 +65,9 @@ int command2Int(char *str, char *output_str) {
     } else if (strcmp(str, "LET") == 0) {
         //ALU
         return LET;
+    } else if (strcmp(str, "END\n") == 0) {
+       strcpy(output_str, " HALT 00");
+       return HALT;
     } else if (strcmp(str, "END") == 0) {
        strcpy(output_str, " HALT 00");
        return HALT;
@@ -209,8 +212,16 @@ int arifmetic_actions(char *actions_basic, FILE *fpout) {
     }
     char accumvar[2];
     char *action;
-    
-    accumvar[0] = *(actions_basic+2);
+    int varshift;
+    int actionshift;
+    if (*(actions_basic) == '~') {
+        varshift = 1;
+        actionshift = 0;
+    } else {
+        varshift = 0;
+        actionshift = 1;
+    }
+    accumvar[0] = *(actions_basic+varshift);
     accumvar[1] = '\n';
     int assembline_var;
     assembline_var = getlinevar(accumvar);
@@ -224,7 +235,7 @@ int arifmetic_actions(char *actions_basic, FILE *fpout) {
     output_str = strcat(itoa(lineassemb_count), output_str);
     strcat(output_str, endstr);
     fputs(output_str, fpout);
-    action = actions_basic + 3;
+    action = actions_basic + actionshift;
     char rightvar[2];
     rightvar[0] = action[1];
     rightvar[1] = '\n';
@@ -235,6 +246,7 @@ int basic2assembArifmetic(char *operandstr, FILE *fpout) {
     char *operandtemp = malloc(sizeof(char)*32);
     strcpy(operandtemp, operandstr);
     char *var = strtok(operandtemp, delim);
+    operandstr = strtok(NULL, delim);
     char *output_str = malloc(sizeof(char) * 16);
     addvar(var);
     if (isVar(operandstr) == 1) {
@@ -245,11 +257,15 @@ int basic2assembArifmetic(char *operandstr, FILE *fpout) {
             varlist.var[varlist.count-2].value = 0;
         }
     } else if (isVar(operandstr) == 0) {
-        varlist.var[varlist.count-1].value = atoi(operandstr);
+        for (int i = 0; i < varlist.count; i++) {
+            if (strcmp(var, varlist.var[i].name) == 0) {
+                varlist.var[i].value = atoi(operandstr);
+            }
+        }
     } else {
         arifmetic_actions(operandstr, fpout);
         strcpy(output_str, " STORE ");
-        strcat(output_str, itoa(varlist.var[varlist.count-1].sa_numline));
+        strcat(output_str, itoa(getlinevar(var)));
         lineassemb_count++;
         output_str = strcat(itoa(lineassemb_count), output_str);
         strcat(output_str, endstr);
@@ -328,7 +344,6 @@ int main(int argc, char *argv[]) {
     //чтение скрипта(только одна функция). кодирование команды и операнда -> помещение в оперативную память
     FILE *fpin;
     FILE *fpout;
-    int ENDING_FLAG = 0;
     char *str = (char *)malloc(sizeof(char) * 32);
     char *output_str = (char *)malloc(sizeof(char) * 32);
     char *memcase;
@@ -341,16 +356,15 @@ int main(int argc, char *argv[]) {
     char *delim = " ";
     char *str1 = (char *)malloc(sizeof(char) * 32);
     char *gotobasicline_str;
-    int sizet = 0;
+    size_t sizestr = 0;
     for (int i = 0; i < 16; i++) {
         sbline2saline[i] = " ";
     }
-    
-    if ((fpin=fopen("basic.sb", "r") )==NULL) {
+    if ((fpin=fopen(argv[1], "r") )==NULL) {
         printf("Cannot open file.\n");
         return -1;
     }
-    if ((fpout=fopen("assemb.sa", "w+") )==NULL) {
+    if ((fpout=fopen(argv[2], "w+") )==NULL) {
         printf("Cannot open file.\n");
         return -1;
     }
@@ -389,11 +403,10 @@ int main(int argc, char *argv[]) {
                 basic2assembLogic(operandstr, gotobasicline_str, fpout);
                 break;
             case GOTO:
-                strcat(output_str, sbline2saline[idgoto]);
+                strcat(output_str, operandstr);
                 lineassemb_count++;
                 lineassemb_str = itoa(lineassemb_count);
                 strcat(lineassemb_str, output_str);
-                strcat(lineassemb_str, endstr);
                 fputs(lineassemb_str, fpout);
                 break;
             case HALT:
@@ -413,14 +426,15 @@ int main(int argc, char *argv[]) {
                 }
                 fclose(fpin);
                 fclose(fpout);
-                fpout=fopen("assemb.sa", "r+");
+                fpout=fopen(argv[2], "r+");
                 //rewind(fpout);
-                lineassemb_count = 0;
+                lineassemb_count = -1;
                 while(!feof (fpout)) {
                     
                     fgets(str, 32, fpout);
-                    sizet += sizeof(str);
+                    
                     if (str[0] == '\n') {
+                        sizestr += strlen(str);
                         continue;
                     }
                     
@@ -437,7 +451,7 @@ int main(int argc, char *argv[]) {
                         strcat(lineassemb_str, output_str);
                         strcat(lineassemb_str, operandstr);
                         strcat(lineassemb_str, endstr);
-                        fseek(fpout, sizet+4, SEEK_SET);
+                        fseek(fpout, sizestr, SEEK_SET);
                         fputs(lineassemb_str, fpout);
                     } else if (strncmp(commandstr, "JNEG", 4) == 0) {
                         operandstr = strcpy(operandstr, sbline2saline[atoi(operandstr) / 10]);
@@ -446,7 +460,7 @@ int main(int argc, char *argv[]) {
                         strcat(lineassemb_str, output_str);
                         strcat(lineassemb_str, operandstr);
                         strcat(lineassemb_str, endstr);
-                        fseek(fpout, sizet+4, SEEK_SET);
+                        fseek(fpout, sizestr, SEEK_SET);
                         fputs(lineassemb_str, fpout);
                         fflush(fpout);
                     } else if (strncmp(commandstr, "JZ", 2) == 0) {
@@ -456,7 +470,7 @@ int main(int argc, char *argv[]) {
                         strcat(lineassemb_str, output_str);
                         strcat(lineassemb_str, operandstr);
                         strcat(lineassemb_str, endstr);
-                        fseek(fpout, sizet+4, SEEK_SET);
+                        fseek(fpout, sizestr, SEEK_SET);
                         fputs(lineassemb_str, fpout);
                     } else if (strncmp(commandstr, "JNS", 3) == 0) {
                         operandstr = strcpy(operandstr, sbline2saline[atoi(operandstr) / 10]);
@@ -465,11 +479,10 @@ int main(int argc, char *argv[]) {
                         strcat(lineassemb_str, output_str);
                         strcat(lineassemb_str, operandstr);
                         strcat(lineassemb_str, endstr);
-                        fseek(fpout, sizet+4, SEEK_SET);
+                        fseek(fpout, sizestr, SEEK_SET);
                         fputs(lineassemb_str, fpout);
-                    } else {
-                        continue;
                     }
+                    sizestr += strlen(str);
                     fflush(fpout);
                 }
                 fclose(fpout);

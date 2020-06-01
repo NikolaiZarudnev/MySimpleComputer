@@ -1,4 +1,4 @@
-#include "CU.h"
+#include "CPU.h"
 enum Commands {
     ASSIGNMENT = 0X0F,
     READ = 0x10,
@@ -19,7 +19,7 @@ enum Commands {
     XOR,
     JNS
 };
-
+int reg = 0;
 int flag_stopCPU = 0;
 int insrtuctionCounter = 0;
 int accumulator = 0;
@@ -43,14 +43,13 @@ void inst_counter (int sig){
     //static int insrtuctionCounter = 0;
     I_InstrCounter(insrtuctionCounter);
     if (insrtuctionCounter > 99) {
-        flag_stopCPU = 1;
         alarm(0);
+        flag_stopCPU = 1;
     }
     if(CU() == 0) {
-        flag_stopCPU = 1;
         alarm(0);
+        flag_stopCPU = 1;
     }
-    
 }
 
 int CU() {
@@ -59,8 +58,10 @@ int CU() {
     int *operand = malloc(sizeof(int));
     int *tempVal1 = malloc(sizeof(int));
     //while (insrtuctionCounter < 100) {
+        
+        
         sc_memoryGet(insrtuctionCounter, value);
-        I_BigCharNumber(value);
+        I_BigCharNumber(*value);
         if (sc_commandDecode(*value, command, operand, 0) == -1) {
             clearInOut();
             mt_setbgcolor(cl_black);
@@ -72,7 +73,11 @@ int CU() {
                 clearInOut();
                 printf("%d < ", *operand);
                 scanf("%d", tempVal1);
-                //error flag oversize? overflow?
+                if (*tempVal1 > 9999 || *tempVal1 < -9999) {
+                    reg = sc_regSet(reg, F_OVERFLOW);
+                    return 0;
+                }
+                
                 sc_memorySet(*operand, *tempVal1);
                 I_PrintMemoryCase(4 + (*operand / 10 + 1) * 7 + *operand / 10, 3 + *operand % 10, *tempVal1, 0, 0);
                 fflush(stdout);
@@ -89,7 +94,7 @@ int CU() {
             case LOAD:
                 sc_memoryGet(*operand, &accumulator);
                 I_Accumulator(accumulator);
-                 fflush(stdout);
+                fflush(stdout);
                 break;
             case STORE:
                 sc_memorySet(*operand, accumulator);
@@ -159,32 +164,56 @@ int ALU(int command, int operand) {
     case ADD:
         sc_memoryGet(operand, tempVal);
         accumulator += *tempVal;
+        if (accumulator > 9999 || accumulator < -9999) {
+            reg = sc_regSet(reg, F_OVERFLOW);
+            return 0;
+        }
         I_Accumulator(accumulator);
         free(tempVal);
         break;
     case SUB:
         sc_memoryGet(operand, tempVal);
         accumulator -= *tempVal;
+        if (accumulator > 9999 || accumulator < -9999) {
+            reg = sc_regSet(reg, F_OVERFLOW);
+            return 0;
+        }
         I_Accumulator(accumulator);
         free(tempVal);
         break;
     case DIVIDE:
         sc_memoryGet(operand, tempVal);
+        if (*tempVal == 0) {
+            reg = sc_regSet(reg, F_ZERODIV);
+            return 0;
+        }
         accumulator /= *tempVal;
+        if (accumulator > 9999 || accumulator < -9999) {
+            reg = sc_regSet(reg, F_OVERFLOW);
+            return 0;
+        }
         I_Accumulator(accumulator);
         free(tempVal);
         break;
     case MUL:
         sc_memoryGet(operand, tempVal);
         accumulator *= *tempVal;
+        if (accumulator > 9999 || accumulator < -9999) {
+            reg = sc_regSet(reg, F_OVERFLOW);
+            return 0;
+        }
         I_Accumulator(accumulator);
         free(tempVal);
         break;
     case NOT: // ТОЛЬКО ЭТА ФУНКЦИЯ
         accumulator = ~accumulator;
+        if (accumulator > 9999 || accumulator < -9999) {
+            reg = sc_regSet(reg, F_OVERFLOW);
+            return 0;
+        }
         I_Accumulator(accumulator);
         sc_memorySet(operand, accumulator);
-        I_PrintMemoryCase(4 + operand / 10 * 7, 3 + operand % 10, ~accumulator, 0, 0);
+        I_PrintMemoryCase(4 + (operand / 10 + 1) * 7 + operand / 10, 3 + operand % 10, accumulator, 0, 0);
         break;
     /*
     case AND:

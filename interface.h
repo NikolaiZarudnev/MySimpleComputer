@@ -11,4 +11,5 @@ void I_Flags (int reg);
 void I_PrintMemoryCase(int x, int y, int value, int selected, int iscommand);
 void I_Memory ();
 void I_Accumulator (int value);
-int I_BigCharNumber (int *value);
+int *get_big(int digit);
+void I_BigCharNumber(int value);

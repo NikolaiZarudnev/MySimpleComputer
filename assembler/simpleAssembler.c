@@ -46,7 +46,7 @@ int command2Int(char *str) {
 //
 
 //бег по файлу
-int main() {
+int main(int argc, char *argv[]) {
     //чтение скрипта(только одна функция). кодирование команды и операнда -> помещение в оперативную память
     FILE *fpin;
     FILE *fpout;
@@ -60,12 +60,11 @@ int main() {
     int output[SIZE];
     int check = 0;
     int memorycase = 0;
-    if ((fpin=fopen("assemb.sa", "r") )==NULL) {
-        //mt
+    if ((fpin=fopen(argv[1], "r") )==NULL) {
         printf("Cannot open file.\n");
         return -1;
     }
-    if ((fpout=fopen("textout.o", "w+b") )==NULL) {
+    if ((fpout=fopen(argv[2], "w+b") )==NULL) {
         printf("Cannot open file.\n");
         return -1;
     }
@@ -90,12 +89,11 @@ int main() {
             }
             
             check = sc_commandEncode(command, operand, encodeLine);
-            output[memorycase] = *encodeLine;
-            *encodeLine = 0;
-            if (check == F_WRONG_COMMAND) {
+            if (check == -1) {
                 return -1;
             }
-            
+            output[memorycase] = *encodeLine;
+            *encodeLine = 0;
         }
     }
     fwrite(output, sizeof(int), SIZE, fpout);

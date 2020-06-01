@@ -160,27 +160,31 @@ void I_PrintMemoryCase(int x, int y, int value, int selected, int iscommand) {
     }
     if (iscommand == 1) {
         printf("+");
+        printf("%x", value);
+        mt_setfgcolor(cl_green);
+        mt_setbgcolor(cl_black);
+        fflush(stdout);
+        return;
     } else {
-        x += 1;
-        mt_gotoXY(x, y);
+        if (value >= 0) {
+            x += 1;
+            mt_gotoXY(x, y);
+        } else {
+            printf("-");
+            value *= -1;
+        }
+        for (int j = 0; j < 4 - digit; j++) {
+            printf("0");
+        }
+        printf("%d", value);
+        mt_setfgcolor(cl_green);
+        mt_setbgcolor(cl_black);
+        fflush(stdout);
+        return;
     }
     
-    for (int j = 0; j < 4 - digit; j++) {
-        /*
-        if (4 - digit < 0)
-        {
-            printf("*!");
-            mt_gotoXY(0, 38);
-            printf("\nError *!: digit < 0\n");
-            mt_gotoXY(x, y);
-            break;
-        }
-        */
-        printf("0");
-    }
-    printf("%d", value);
-    mt_setfgcolor(cl_green);
-	mt_setbgcolor(cl_black);
+    
+    
 }
 
 void I_Memory () {
@@ -210,117 +214,97 @@ void I_Accumulator (int value) {
     I_PrintMemoryCase(99, 3, value, 0, 0);
 }
 
-int I_BigCharNumber (int *value) {
-    char str[5] = "00000";
-    int temp_value = *value;
-    str[0] = '+';
-    int str_i = 4;
-    while (temp_value / 10 != 0)
-    {
-        str[str_i--] = temp_value % 10 + '0';
-        temp_value /= 10;
-    }
-    str[str_i] = temp_value + '0';
+//получение цифры бигчара
+int *get_big(int digit) {
+	int *bigchar = malloc(2 * sizeof(int));
+	switch (digit) {
+		case 1:
+			bigchar[0] = 0x12141810;
+            bigchar[1] = 0x10101010;
+			break;
+		case 2:
+			bigchar[0] = 0x3060C3FF;
+            bigchar[1] = 0xFF03060C;
+			break;
+		case 3:
+			bigchar[0] = 0x3060C0FF;
+            bigchar[1] = 0xFFC06030;
+			break;
+		case 4:
+			bigchar[0] = 0x81818181;
+            bigchar[1] = 0x808080FF;
+			break;
+		case 5:
+			bigchar[0] = 0xFF0101FF;
+            bigchar[1] = 0xFF808080;
+			break;
+		case 6:
+			bigchar[0] = 0x10101FF;
+            bigchar[1] = 0xFF8181FF;
+			break;
+		case 7:
+			bigchar[0] = 0x3060C0FF;
+            bigchar[1] = 0x3060C18;
+			break;
+		case 8:
+			bigchar[0] = 0x818181FF;
+            bigchar[1] = 0xFF8181FF;
+			break;
+		case 9:
+			bigchar[0] = 0xFF8181FF;
+            bigchar[1] = 0x183060C0;
+			break;
+		case 0:
+			bigchar[0] = 0x818181FF;
+            bigchar[1] = 0xFF818181;
+			break;
+		case 10:
+			bigchar[0] = 0xFFC3C3FF;
+			bigchar[1] = 0xC3C3C3C3;
+			break;
+		case 11:
+			bigchar[0] = 0x3FC3C33F;
+			bigchar[1] = 0x3FC3C3FF;
+			break;
+		case 12:
+			bigchar[0] = 0x30303FF;
+			bigchar[1] = 0xFF030303;
+			break;
+		case 13:
+			bigchar[0] = 0xC3C3C33F;
+			bigchar[1] = 0x3FC3C3C3;
+			break;
+		case 14:
+			bigchar[0] = 0xFF0303FF;
+			bigchar[1] = 0xFF0303FF;
+			break;
+		case 15:
+			bigchar[0] = 0xFF0303FF;
+			bigchar[1] = 0x3030303;
+			break;
+		
+	}
+	
+	return bigchar;
+}
+//вывод биг чар
+void I_BigCharNumber(int value) {
+	int bigchar[2];
+
+	bigchar[0] = 0x10101010;
+    bigchar[1] = 0x101010FF;
     int x, y;
+    int *b;
+    int digit;
     x = 5;
     y = 20;
-    int bigchar[2];
     mt_gotoXY(x, y);
-    for (size_t i = 0; i < 5; i++)
-    {
-        switch (str[i])
-        {
-        case '+':
-			bigchar[0] = 0x10101010;
-            bigchar[1] = 0x101010FF;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-            }
-			break;
-		case '0':
-            bigchar[0] = 0x818181FF;
-            bigchar[1] = 0xFF818181;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '1':
-			
-            bigchar[0] = 0x12141810;
-            bigchar[1] = 0x10101010;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '2':
-			
-            bigchar[0] = 0x3060C3FF;
-            bigchar[1] = 0xFF03060C;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '3':
-			
-            bigchar[0] = 0x3060C0FF;
-            bigchar[1] = 0xFFC06030;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '4':
-			
-            bigchar[0] = 0x81818181;
-            bigchar[1] = 0x808080FF;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '5':
-			
-            bigchar[0] = 0xFF0101FF;
-            bigchar[1] = 0xFF808080;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '6':
-			
-            bigchar[0] = 0x10101FF;
-            bigchar[1] = 0xFF8181FF;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '7':
-			
-            bigchar[0] = 0x3060C0FF;
-            bigchar[1] = 0x3060C18;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '8':
-			
-            bigchar[0] = 0x818181FF;
-            bigchar[1] = 0xFF8181FF;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		case '9':
-			
-            bigchar[0] = 0xFF8181FF;
-            bigchar[1] = 0x183060C0;
-			if (bc_printbigchar(bigchar, x, y, cl_green, cl_black) == -1) {
-				return -1;
-			}
-			break;
-		default:
-			return 1;
-			break;
-        }
-        x += 9;
+    bc_printbigchar(bigchar, x, y, cl_green, cl_black);
+    x = 14;
+	for(int i = 3; i >= 0; i--, x += 9) {
+		b = NULL;
+		digit = (value >> (4 * i)) & 0xF;
+		b = get_big(digit);
+		bc_printbigchar(b, x, y, cl_green, cl_black);
     }
-    return 0;
 }

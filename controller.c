@@ -50,18 +50,31 @@ void ctrl_Controller(int key, int *x, int *y, int *addres) {
         setitimer (ITIMER_VIRTUAL, &nval, &oval);
         while (!cpu_getflagCPU()) {
             signal(SIGVTALRM, inst_counter);
-            //rk_readkey(key_pause);
-            //if (*key_pause == KEY_p) {
-            //    alarm(0);
-            //    break;
-            //}
         }
         break;
     case KEY_t:
         inst_counter(1);
         break;
     case KEY_i:
-        raise(SIGUSR1);
+        *value = 0;
+        sc_memoryInit();
+        int reg = sc_regInit();
+        mt_clrscr();
+        I_viewMySC();
+        I_Memory ();
+        I_Operation();
+        I_InstrCounter (0);
+        I_Flags (reg);
+        I_Accumulator (0);
+        I_BigCharNumber (*value);
+        sc_regInit();
+        mt_gotoXY(0, 37);
+        printf("Input/Output");
+        mt_gotoXY(0, 38);
+        fflush(stdout);
+        free(value);
+        cpu_setAccumulator(0);
+        cpu_setInstructionCounter(0);
         break;
     case KEY_q:
         rk_mytermregime(0, 0, 0, 0, 0);

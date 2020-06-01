@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "memory.h"
-#include "myTerm.h"
 char* itoa(int n);
 void reverse(char s[]);
 int command2Int(char *str, char *output_str);

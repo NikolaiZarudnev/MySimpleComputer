@@ -1,8 +1,6 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "myterm.h": "c",
-        "memory.h": "c",
         "ioctl.h": "c",
         "types.h": "c",
         "type_traits": "c",

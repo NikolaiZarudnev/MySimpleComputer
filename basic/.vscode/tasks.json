@@ -13,8 +13,6 @@
                 "-g", 
                 "-Wall",  
                 "${fileDirname}/simpleBasic.c", 
-                "${fileDirname}/memory.c", 
-                "${fileDirname}/myTerm.c", 
                 "-o", 
                 "${fileDirname}/sba"
             ],

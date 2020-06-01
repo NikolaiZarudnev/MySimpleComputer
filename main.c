@@ -11,31 +11,15 @@
 #include "interface.h"
 #include "myReadKey.h"
 #include "controller.h"
-#include "CU.h"
-void signalhandlerreset(int sig) {
-    int *val = malloc(sizeof(int));
-    *val = 0;
-    sc_memoryInit();
-    int reg = sc_regInit();
-    I_Memory ();
-    I_Operation();
-    I_InstrCounter(*val);
-    I_Flags (reg);
-    I_Accumulator(*val);
-    I_BigCharNumber(val);
-    free(val);
-}
+#include "CPU.h"
 
 int main() {
-
-    //rk_mytermregime(1, 0, 1, 1, 0);
     int *x = malloc(sizeof(int));
     int *y = malloc(sizeof(int));
     int *addres = malloc(sizeof(int));
     *x = 11;
     *y = 3;
     *addres = 0;
-
     int reg = sc_regInit();
     sc_memoryInit();
     int *value = malloc(sizeof(int));
@@ -44,27 +28,21 @@ int main() {
     mt_clrscr();
     I_viewMySC();
     I_Memory ();
-    
     I_Operation();
     I_InstrCounter (0);
     I_Flags (reg);
     I_Accumulator (0);
-    I_BigCharNumber (value);
+    I_BigCharNumber (*value);
     sc_regInit();
     mt_gotoXY(0, 37);
     printf("Input/Output");
     mt_gotoXY(0, 38);
-    
-    signal (SIGUSR1, signalhandlerreset);
-    
-    //signal (SIGUSR2, stop_timer);
     fflush(stdout);
     while (1) {
-        
         rk_readkey(key);
         ctrl_Controller(*key, x, y, addres);
         I_Flags (reg);
-        
+        mt_gotoXY(0, 38);
         fflush(stdout);
     }
     return 0;
