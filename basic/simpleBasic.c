@@ -60,10 +60,8 @@ int command2Int(char *str, char *output_str) {
         strcpy(output_str, " JUMP ");
         return GOTO;
     } else if (strcmp(str, "IF") == 0) {
-        //условные функции типа JZ
         return IF;
     } else if (strcmp(str, "LET") == 0) {
-        //ALU
         return LET;
     } else if (strcmp(str, "END\n") == 0) {
        strcpy(output_str, " HALT 00");
@@ -285,11 +283,6 @@ int basic2assembLogic(char *logical, char* gotobasicline_str, FILE *fpout) {
     if (gotobasicline_str == NULL) {
         return -1;
     }
-    // все линии в ассемблере функций прыжков запомнить в массиве jumpassemb[].
-    // каждый новый прыжок ето новая ячейка в ету ячейку записать (lineassemb_count+1)(по класеке крч)
-    // потом в конце транслятора в case HALT: записать во все ети места номера строк на которые они должны указывать
-    // во все goto записываются сначала basicline и потом в HALT возвращаемся ко всем jump и меняем basicline
-    // на assembline которые хранятся в sbline2saline[] 
     strcpy(output_str, " LOAD ");
     strcat(output_str, itoa(idvar));
     lineassemb_count++;
@@ -328,20 +321,8 @@ int basic2assembLogic(char *logical, char* gotobasicline_str, FILE *fpout) {
     }
 
 }
-/*
-char *strtok(char *str1, char *str2) {
-    for (int i = 0; str[i] != str2[0]; i++) {
-        /* code */
-    //}
-    
-//}
-
-void sa_splitLine(char *str, char *memcase, char *commandstr, char *operandstr) {
-    
-}
 
 int main(int argc, char *argv[]) {
-    //чтение скрипта(только одна функция). кодирование команды и операнда -> помещение в оперативную память
     FILE *fpin;
     FILE *fpout;
     char *str = (char *)malloc(sizeof(char) * 32);
@@ -427,7 +408,6 @@ int main(int argc, char *argv[]) {
                 fclose(fpin);
                 fclose(fpout);
                 fpout=fopen(argv[2], "r+");
-                //rewind(fpout);
                 lineassemb_count = -1;
                 while(!feof (fpout)) {
                     

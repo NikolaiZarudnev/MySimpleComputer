@@ -14,4 +14,3 @@ int actionAssemb(char *var, char *action, FILE *fpout);
 int arifmetic_actions(char *actions_basic, FILE *fpout);
 int basic2assembArifmetic(char *operandstr, FILE *fpout);
 int basic2assembLogic(char *str, char* gotobasicline_str, FILE *fpout);
-void sa_splitLine(char *str, char *memcase, char *commandstr, char *operandstr);

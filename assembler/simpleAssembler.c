@@ -3,7 +3,6 @@ int case2Int(char *mcase) {
     
     int value = atoi(mcase);
     if (value > 99 || value < 0) {
-        //F_OUT_OF_RANGE
         return -1;
     }
     return value;
@@ -43,11 +42,7 @@ int command2Int(char *str) {
         return 0;
     }
 }
-//
-
-//бег по файлу
 int main(int argc, char *argv[]) {
-    //чтение скрипта(только одна функция). кодирование команды и операнда -> помещение в оперативную память
     FILE *fpin;
     FILE *fpout;
     char str[16];
@@ -101,5 +96,4 @@ int main(int argc, char *argv[]) {
     fclose(fpin);
     fclose(fpout);
     return 0;
-    //
 }

@@ -61,10 +61,10 @@ int sc_regInit() {
 int sc_regSet(int reg, int value) {
     if (checkFlag(value) && value >= 1 && value <= 32)
     {
-        register_flags = reg | (1 << (value - 1));
+        register_flags |= reg | value;
         return register_flags;
     } else {
-        register_flags = reg | (1 << (F_WRONG_FLAG - 1));
+        register_flags |= F_WRONG_FLAG;
         return register_flags;
     }
 }

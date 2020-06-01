@@ -4,7 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 #include "memory.h"
-#include "myTerm.h"
 
 enum Commands {
     ASSIGNMENT = 0x0F,
